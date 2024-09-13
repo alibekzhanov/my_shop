@@ -1,0 +1,52 @@
+{% extends "shop/base.html" %}
+
+{% block title %}
+Оформление заказа
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Оформление заказа</h2>
+
+    <form method="post" class="mb-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.as_p }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg">Оформить заказ</button>
+    </form>
+
+    <h3 class="mt-5">Товары в корзине</h3>
+    
+    {% if cart.cart_item.exists %}
+        <ul class="list-group mb-4">
+            {% for item in cart.cart_item.all %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <a href="{% url 'product_detail' item.product.slug %}" class="text-dark">{{ item.product.name }}</a>
+                    <span class="text-muted">({{ item.quantity }} x {{ item.product.get_display_price }})</span>
+
+                    <div class="btn-group" role="group">
+                        <form action="{% url 'cart_add' item.product.slug %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </form>
+                        <form action="{% url 'cart_remove' item.product.slug %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <span class="text-muted">{{ item.get_total_item_price }} тенге</span>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <p class="h5">Итоговая цена: <strong>{{ cart.get_discounted_price }} тенге</strong></p>
+    {% else %}
+        <p>Ваша корзина пуста.</p>
+    {% endif %}
+</div>
+{% endblock %}

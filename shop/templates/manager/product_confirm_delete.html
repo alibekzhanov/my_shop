@@ -1,0 +1,15 @@
+{% extends "manager/base.html" %}
+
+{% block title %}
+    Удаление товара
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <h1 class="mb-4">Вы успешно удалили товар!</h1>
+
+    <a href="{% url 'manager_products' %}" class="btn btn-primary btn-lg mt-3">
+        Вернуться к списку
+    </a>
+</div>
+{% endblock %}

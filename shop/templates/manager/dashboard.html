@@ -1,0 +1,37 @@
+{% extends "manager/base.html" %}
+
+{% block title %}
+    Статистика сайта
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Статистика сайта</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Количество пользователей</h5>
+                    <p class="card-text"><b>{{ users_count }}</b></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Количество проданных товаров</h5>
+                    <p class="card-text"><b>{{ total_sold }}</b></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Итоговый заработок</h5>
+                    <p class="card-text"><b>{{ total_revenue }}</b> тенге</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

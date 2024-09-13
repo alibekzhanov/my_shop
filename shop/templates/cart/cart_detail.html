@@ -1,0 +1,53 @@
+{% extends "shop/base.html" %}
+
+{% block title %}
+    Корзина
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Корзина</h2>
+
+    {% if cart.cart_item.exists %}
+        <ul class="list-group mb-4">
+            {% for item in cart.cart_item.all %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <a href="{% url 'product_detail' item.product.slug %}" class="text-dark">
+                        {{ item.product.name }} 
+                    </a>
+                    <span class="text-muted">({{ item.quantity }} x {{ item.product.get_display_price | safe}})</span>
+
+                    <span class="text-muted">{{ item.get_total_item_price }} тенге</span>
+                    <div class="btn-group" role="group">
+                        <form action="{% url 'cart_add' item.product.slug %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            {% if item.product.quantity > item.quantity %}
+                                <button type="submit" class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            {% else %}
+                                <span class="text-danger">Нет в наличии</span>
+                                <button type="submit" class="btn btn-sm btn-outline-success" disabled>
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            {% endif %}
+                        </form>
+                        <form action="{% url 'cart_remove' item.product.slug %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <p class="h5">Итоговая цена: <strong>{{ cart.get_discounted_price }} тенге</strong></p>
+
+        <a href="{% url 'order_create' %}" class="btn btn-primary btn-lg mt-3">Оформить заказ</a>
+    {% else %}
+        <p class="text-center">Ваша корзина пуста.</p>
+    {% endif %}
+</div>
+{% endblock %}

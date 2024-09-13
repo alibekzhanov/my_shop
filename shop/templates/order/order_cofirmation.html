@@ -1,0 +1,28 @@
+{% extends "shop/base.html" %}
+
+{% block title %}
+    Подтверждение заказа
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <h1 class="mb-4">Спасибо за ваш заказ!</h1>
+    <p class="lead">Ваш заказ был успешно оформлен. Номер вашего заказа: <strong>{{ order.id }}</strong></p>
+    <p>Адрес доставки: <strong>{{ order.address }}</strong></p>
+    <p>Общая стоимость: <strong>{{ order.total_price }} тенге</strong></p>
+
+    <h2 class="mt-5">Детали заказа</h2>
+    <ul class="list-group mb-4">
+        {% for item in order.items.all %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ item.quantity }} x {{ item.product.name }} 
+                <span class="text-muted">{{ item.price }} тенге</span>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg mt-3">
+        Вернуться к покупкам
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}
+    {{ product.name }}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">{{ product.name }}</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <img src="{{ product.image.url }}" class="img-fluid border rounded" style="max-height: 400px; object-fit: cover;" alt="{{ product.name }}">
+        </div>
+        <div class="col-md-6">
+            <p class="lead">Цена: <strong>{{ product.get_display_price|safe }}</strong> тенге</p>
+            <p class="mb-4">{{ product.description }}</p>
+            {% if user.is_authenticated %}
+            <form action="{% url 'cart_add' product.slug %}" method="post" class="mt-4">
+                {% csrf_token %}
+                <button class="btn btn-primary btn-lg" type="submit">Добавить в корзину</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a class="btn btn-secondary" href="{% url 'product_list' %}">
+            <i class="fas fa-arrow-left"></i> Обратно к каталогу
+        </a>
+    </div>
+</div>
+{% endblock %}

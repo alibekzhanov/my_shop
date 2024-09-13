@@ -1,0 +1,21 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+    <h2>Мои заказы</h2>
+
+    {% if orders %}
+        <ul>
+        {% for order in orders %}
+            <li>
+            <p>Номер заказа: {{ order.id }}</p>
+            <p>Дата оформления: {{ order.created_at }}</p>
+            <p>Статус: {{ order.status }}</p>
+            <p>Общая сумма: {{ order.total_price }} тенге </p>
+            <a href="{% url 'order_confirmation' order.id %}">Подробнее</a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>У вас пока нет заказов.</p>
+    {% endif %}
+{% endblock %}

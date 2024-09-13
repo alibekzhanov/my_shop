@@ -1,0 +1,38 @@
+{% extends "manager/base.html" %}
+
+{% block title %}
+    Заказы
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Заказы</h2>
+
+    <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Клиент</th>
+                <th scope="col">Итоговая сумма</th>
+                <th scope="col">Адрес</th>
+                <th scope="col">Статус</th>
+                <th scope="col">Статус оплаты</th>
+                <th scope="col">Дата создания</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td><a href="{% url 'update_order' order.pk %}">{{ order.pk }}</a></td>
+                    <td>{{ order.user.username }}</td>
+                    <td>{{ order.total_price }} тенге</td>
+                    <td>{{ order.address }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>{{ order.payment_status }}</td>
+                    <td>{{ order.created_at|date:"d M Y, H:i" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

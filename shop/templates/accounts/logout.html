@@ -1,0 +1,13 @@
+{% extends "shop/base.html" %}
+
+{% block title %}
+    Выход
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <h2 class="mb-4">Выход</h2>
+    <p class="lead">Вы успешно вышли из аккаунта.</p>
+    <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg mt-3">Вернуться к каталогу</a>
+</div>
+{% endblock %}

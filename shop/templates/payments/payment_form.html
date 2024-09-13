@@ -1,0 +1,45 @@
+{% extends 'shop/base.html' %}
+
+
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class="text-center">Оплата</h2>
+    <p class="h5">Итоговая цена: <strong>{{ total_price }} тенге</strong></p>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary btn-block">Оплатить</button>
+            </form>
+        </div>
+    </div>
+    <h2 class="mt-5">Детали заказа</h2>
+    <ul class="list-group mb-4">
+        {% for item in order.items.all %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ item.quantity }} x {{ item.product.name }} 
+                <span class="text-muted">{{ item.price }} тенге</span>
+            </li>
+        {% endfor %}
+    </ul>
+    
+    {% if result %}
+    <div class="mt-4">
+        {% if result.status == 'success' %}
+            <div class="alert alert-success">
+                <h5>Транзакция ID{{ result.transaction_id }} прошла успешно</h5>
+                <p>{{ result.message|safe }}</p>
+            </div>
+        {% else %}
+            <div class="alert alert-danger">
+                <h5>Транзакция ID {{ result.transaction_id }} не удалась</h5>
+                <p>{{ result.message }}</p>
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
