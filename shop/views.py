@@ -17,6 +17,7 @@ from django.core.mail import send_mail
 from .fake_payment_system import FakePaymentSystem
 from .payment_gateaway import PaymentSystem
 
+
 def gmail_mail(request):
     return HttpResponse("Вы отправили email")
 
@@ -24,6 +25,7 @@ def gmail_mail(request):
 class ManagerMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
         return self.request.user.groups.filter(name="Менеджеры").exists()
+
 
 class ManagerDashboardView(ManagerMixin, TemplateView):
     template_name = 'manager/dashboard.html'
@@ -34,20 +36,24 @@ class ManagerDashboardView(ManagerMixin, TemplateView):
         context['total_revenue'] = Order.objects.get_revenue()
         context['total_sold'] = OrderItem.objects.get_count_products_sold()
 
-
         return context
+
 
 class ManagerOrdersView(ManagerMixin, ListView):
     model = Order
     template_name = 'manager/orders.html'
     context_object_name = 'orders'
     ordering = ['-created_at']
+    paginate_by = 3  # Количество заказов на одной странице
+
 
 class ManagerProductsView(ManagerMixin, ListView):
     model = Product
     template_name = 'manager/products.html'
     context_object_name = 'products'
     ordering = ['-created_at']
+    paginate_by = 3  # Количество товаров на одной странице
+
 
 class ManagerProductsUpdateView(ManagerMixin, UpdateView):
     model = Product
@@ -57,10 +63,12 @@ class ManagerProductsUpdateView(ManagerMixin, UpdateView):
     fields = ['description', 'price', 'discount_price', 'category', 'image', 'quantity']
     success_url = reverse_lazy('manager_products')
 
+
 class ManagerProductsDeleteView(ManagerMixin, DeleteView):
     template_name = 'manager/product_confirm_delete.html'
     model = Product
     success_url = reverse_lazy('manager_products')
+
 
 class ManagerProductsAddView(ManagerMixin, CreateView):
     model = Product
@@ -71,6 +79,7 @@ class ManagerProductsAddView(ManagerMixin, CreateView):
     def form_valid(self, form):
         print("Форма валидна")
         return super().form_valid(form)
+
 
 class ManagerOrdersUpdateView(ManagerMixin, UpdateView):
     model = Order
@@ -88,6 +97,7 @@ class CartDetailView(TemplateView, LoginRequiredMixin):
         context['cart'] = cart
         return context
 
+
 class AddToCartView(View, LoginRequiredMixin):
     def post(self, request, *args, **kwargs):
         product = get_object_or_404(Product, slug = self.kwargs['slug'])
@@ -98,6 +108,7 @@ class AddToCartView(View, LoginRequiredMixin):
                 cart_item.quantity += 1
         cart_item.save()
         return redirect('cart')
+
 
 class RemoveToCartView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
@@ -116,10 +127,12 @@ class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
     success_url = reverse_lazy('product_list')
 
+
 class CustomLogoutView(LogoutView):
     template_name = 'accounts/logout.html'
     success_url = reverse_lazy('product_list')
     
+
 class SignUp(FormView):
     template_name = "accounts/signup.html"
     form_class = UserRegistrationForm
@@ -136,6 +149,7 @@ class SignUp(FormView):
         )
         login(self.request, user, backend='django.contrib.auth.backends.ModelBackend')
         return super().form_valid(form)
+
 
 class ProductListView(ListView):
     model = Product
@@ -159,6 +173,7 @@ class ProductListView(ListView):
             context["category"] = get_object_or_404(Category, slug = self.kwargs['category_slug'])
         return context
 
+
 class ProductDetailView(DetailView):
     model = Product
     template_name = "shop/product/product_detail.html"
@@ -167,7 +182,6 @@ class ProductDetailView(DetailView):
     def get_queryset(self):
         return Product.objects.filter(slug=self.kwargs['slug'])
     
-
 
 class OrderCreateView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
@@ -192,17 +206,17 @@ class OrderCreateView(LoginRequiredMixin, View):
                 item.product.save()
 
                 OrderItem.objects.create(
-                    order = order,
-                    product = item.product,
-                    quantity = item.quantity
+                    order=order,
+                    product=item.product,
+                    quantity=item.quantity
                 )
-
 
             cart.cart_item.all().delete()
 
-            return redirect('payment', order_id = order.id)
-        return redirect(request, 'order/order_create.html', {'form' : form, 'cart' : cart})
+            return redirect('payment', order_id=order.id)
+        return redirect(request, 'order/order_create.html', {'form': form, 'cart': cart})
     
+
 class OrderConfirmationView(LoginRequiredMixin, DetailView):
     model = Order
     template_name = 'order/order_cofirmation.html'
@@ -211,10 +225,11 @@ class OrderConfirmationView(LoginRequiredMixin, DetailView):
     def get_object(self):
         return get_object_or_404(Order, id=self.kwargs['order_id'], user=self.request.user)
     
+
 class AddAlertView(View):
     def post(self, request, *args, **kwargs):
-        product = get_object_or_404(Product, slug = self.kwargs['slug'])
-        АvailabilityAlert.objects.get_or_create(user = request.user, product = product)
+        product = get_object_or_404(Product, slug=self.kwargs['slug'])
+        АvailabilityAlert.objects.get_or_create(user=request.user, product=product)
         return redirect('product_list')
 
 
@@ -223,13 +238,13 @@ class PaymentView(LoginRequiredMixin, FormView):
     form_class = PaymentForm
     success_url = reverse_lazy('payment')
 
-    payment_system : PaymentSystem = FakePaymentSystem()
+    payment_system: PaymentSystem = FakePaymentSystem()
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         
         order_id = self.kwargs.get("order_id")
-        order = get_object_or_404(Order, id = order_id, user = self.request.user)
+        order = get_object_or_404(Order, id=order_id, user=self.request.user)
 
         context['order'] = order
         context['total_price'] = order.total_price
@@ -242,7 +257,7 @@ class PaymentView(LoginRequiredMixin, FormView):
         expired_date = form.cleaned_data['expired_date']
 
         order_id = self.kwargs.get("order_id")
-        order = get_object_or_404(Order, id = order_id, user = self.request.user)
+        order = get_object_or_404(Order, id=order_id, user=self.request.user)
         total_price = order.total_price
 
         result = self.payment_system.create_payment(total_price, card_number=card_number, cvc=cvc, expired_date=expired_date)
@@ -250,9 +265,9 @@ class PaymentView(LoginRequiredMixin, FormView):
         if result['status'] == 'success':
             order.payment_status = True
             order.save()
-            return redirect('order_confirmation', order_id= order.id)
+            return redirect('order_confirmation', order_id=order.id)
 
-        context = self.get_context_data(result = result)
+        context = self.get_context_data(result=result)
         return self.render_to_response(context)
     
 
